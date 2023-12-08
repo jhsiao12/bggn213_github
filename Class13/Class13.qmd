@@ -1,0 +1,270 @@
+---
+title: "Class 13: RNASeq Analysis with DESeq2"
+author: "Jason Hsiao (PID: A15871650)"
+format: pdf
+---
+
+The data for this hands-on session comes from a published RNA-seq experiment where airway smooth muscle cells were treated with dexamethasone, a synthetic glucocorticoid steroid with anti-inflammatory effects (Himes et al. 2014).
+
+## Libraries
+```{r, message = FALSE, warning = FALSE}
+library(BiocManager)
+library(DESeq2)
+
+```
+
+## Data Import
+```{r}
+counts <- read.csv("airway_scaledcounts.csv", row.names=1)
+metadata <- read.csv("airway_metadata.csv")
+
+```
+
+> Q1. How many genes are in this dataset?
+
+```{r}
+nrow(counts)
+```
+
+> Q2. How many ‘control’ cell lines do we have?
+
+```{r}
+sum(metadata$dex == "control")
+```
+I want to compare the control to the treated columns. To do this I will
+- Step 1. Identify and extract the "control" columns. 
+- Step 2. Calculate the mean value per gene for all these "control" columns. 
+- Step 3. Do the same for "treated" columns.
+- Step 4. Compare the `control.mean` and `treated.mean` values. 
+
+Step 1: 
+```{r, echo = FALSE}
+control.inds <- metadata$dex == "control" #control column indices
+metadata[control.inds, ] #obtaining rows that are "control"
+
+#Step 2: calculating mean value per gene ('SummarizedExperiment')
+control.mean <- rowMeans(counts[, control.inds])
+
+head(control.mean) #confirming it worked
+```
+Repeating for "treated" columns
+```{r}
+treated.inds <- metadata$dex == "treated" #control column indices
+metadata[treated.inds, ] #obtaining rows that are "control"
+
+#Step 2: calculating mean value per gene ('SummarizedExperiment')
+treated.mean <- rowMeans(counts[, treated.inds])
+
+head(treated.mean) #confirming it worked
+
+```
+We will combine our meancount data for bookkeeping purposes (visualizing, etc)...
+```{r}
+meancounts <- data.frame(control.mean, treated.mean)
+
+```
+
+Let's see what these count values look like...
+```{r}
+library(ggplot2)
+ggplot(meancounts, aes(control.mean, treated.mean)) +
+        geom_point(alpha = 0.2) +
+        xlab("Control") +
+        ylab("Treated") +
+        scale_x_log10() +
+        scale_y_log10() +
+        coord_quickmap()
+       
+```
+We are going to add log2(FC) as a column of data to `meancounts` results table.
+```{r}
+meancounts$log2fc <- log2(meancounts$treated.mean/meancounts$control.mean)
+head(meancounts)
+
+#notice we have a few genes that have zero reads. Let's remove these and make it to an object 'mycounts'
+library(dplyr)
+mycounts <- subset(meancounts, ((meancounts[,1] > 0) & (meancounts[,2] > 0))) 
+
+  #i.e. subset meancounts ONLY IF, for a gene, control.mean column is greater than zero AND treated.mean column is greater than zero
+
+```
+> Q. How many genes do I have left
+
+```{r}
+nrow(mycounts)
+
+```
+
+> Q. How many genes are "upregulated" i.e. have a log2(FC) greater than +2?
+
+```{r}
+sum(mycounts$log2fc > +2)
+
+```
+> Q. How many genes are "downregulated" i.e. have a log2(FC) below than -2?
+
+```{r}
+sum(mycounts$log2fc < -2)
+```
+
+
+## Running DESeq2
+
+Setting up DESeq2 object
+```{r}
+dds <- DESeqDataSetFromMatrix(countData = counts,
+                               colData = metadata,
+                               design = ~ dex)
+dds
+
+#QC by PCA Analysis
+vsd <- vst(dds, blind = FALSE)
+plotPCA(vsd, intgroup = c("dex"))
+
+```
+
+Running DESeq analysis on dds (DESeq2 object)
+```{r}
+dds <- DESeq(dds, test = "LRT", reduced= ~1)
+
+res <- results(dds)
+
+```
+
+A common summary visualization is called a Volcano plot.
+```{r}
+plot(res$log2FoldChange, -log10(res$padj))
+
+# Add some cut-off lines
+abline(v=c(-2,2), col="darkgray", lty=2)
+abline(h=-log(0.05), col="darkgray", lty=2)
+
+# Setup our custom point color vector 
+mycols <- rep("gray", nrow(res)) #repeat color gray for all genes in results
+mycols[ abs(res$log2FoldChange) > 2 ]  <- "black" #color genes that are upregulated and downregulated, using absolute value function, as black  
+
+inds <- (res$padj < 0.05) & (abs(res$log2FoldChange) > 2 ) 
+mycols[ inds ] <- "blue" #color genes upregulated AND downregulated above p-value threshold to be blue
+
+
+# Volcano plot with custom colors 
+plot( res$log2FoldChange,  -log(res$padj), 
+ col = mycols, ylab = "-Log(P-value)", xlab = "Log2(FoldChange)" )
+
+# Cut-off lines
+abline(v = c(-2,2), col = "gray", lty = 2)
+abline(h = -log(0.05), col = "gray", lty = 2)
+
+```
+
+## Adding annotation data 
+
+We want to give meaning to our ensemble IDs into understandable gene names and their identifiers that other databases use for downstream use:
+```{r}
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+
+columns(org.Hs.eg.db)
+
+res$symbol <- mapIds(org.Hs.eg.db,
+                     keys = row.names(res), # Our gene names
+                     keytype = "ENSEMBL",        # The format of our genenames
+                     column = "SYMBOL",          # The new format we want to add
+                     multiVals = "first") #tells it to map the identifier to the first 'hit' if it has                                               multiple
+head(res)
+
+```
+
+## Pathway analysis with R and Bioconductor
+
+GO Uses Entrez Terms:
+```{r}
+res$entrez <- mapIds(org.Hs.eg.db,
+                     keys = row.names(res), 
+                     keytype = "ENSEMBL",        
+                     column = "ENTREZID",          
+                     multiVals = "first") 
+
+head(res$entrez)
+
+```
+
+Doing it for Uniprot, and also General Gene Name. i.e. you can get Uniprot IDs and Gene names for corresponding ENSEMBL identifier from the databases catalogued by the org.Hs.eg.db database. 
+```{r}
+res$uniprot <- mapIds(org.Hs.eg.db,
+                     keys = row.names(res), 
+                     keytype = "ENSEMBL",        
+                     column = "UNIPROT",          
+                     multiVals = "first") 
+head(res$uniprot)
+
+res$gene <- mapIds(org.Hs.eg.db,
+                     keys = row.names(res), 
+                     keytype = "ENSEMBL",        
+                     column = "GENENAME",          
+                     multiVals = "first") 
+head(res$gene)
+
+```
+
+Now we can load the packages and setup the KEGG data-sets we need. The gageData package has pre-compiled databases mapping genes to KEGG pathways and GO terms for common organisms. `kegg.sets.hs` is a named list of 229 elements. Each element is a character vector of member gene Entrez IDs for a single KEGG pathway.
+
+```{r}
+library(pathview)
+library(gage)
+library(gageData)
+
+data(kegg.sets.hs)
+
+# Examine the first 2 pathways in this kegg set for humans
+head(kegg.sets.hs, 2)
+
+```
+The main gage() function requires a named vector of fold changes, where the names of the values are the Entrez gene IDs.
+
+Note that we used the mapIDs() function above to obtain Entrez gene IDs (stored in `res$entrez`) and we have the fold change results from DESeq2 analysis (stored in `res$log2FoldChange`).
+
+```{r}
+foldchanges = res$log2FoldChange
+names(foldchanges) = res$entrez
+head(foldchanges)
+
+```
+
+Now, let’s run the gage pathway analysis.
+```{r}
+keggres = gage(foldchanges, gsets=kegg.sets.hs)
+
+```
+
+Look at the first three down (less) pathways
+```{r}
+head(keggres$less, 3)
+
+```
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa05310")
+
+```
+Each `keggres$less` and `keggres$greater` object is data matrix with gene sets as rows sorted by p-value.
+
+Now, let’s try out the `pathview()` function from the pathview package to make a pathway plot with our RNA-Seq expression results shown in color. To begin with lets manually supply a pathway.id (namely the first part of the `"hsa05310 Asthma"`) that we could see from the print out above.
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa05310")
+```
+
+If we also want our volcano plot to look even more fancy now, we can use the Bioconductor package `EnhancedVolcano` alongside our updated identifier symbols:
+```{r}
+library(EnhancedVolcano)
+
+x <- as.data.frame(res)
+
+
+EnhancedVolcano(x,
+    lab = x$symbol,
+    x = 'log2FoldChange',
+    y = 'padj')
+
+```

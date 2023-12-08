@@ -1,0 +1,259 @@
+---
+title: "Class 7: Machine Learning 1"
+author: "Jason Hsiao (PID: A15871650)"
+format: pdf
+---
+
+# Clustering
+
+We will start with k-means clustering, one of the most prevalent of all clustering methods.
+
+To get started let's make up some data:
+```{r}
+hist( rnorm(10000, mean = 3) )
+
+```
+```{r}
+tmp <- c( rnorm(30,3), rnorm(30, -3))
+tmp
+x <- cbind(x = tmp, y = rev(tmp))
+head(x)
+plot(x)
+```
+
+The main function in R for K-means clustering is called `kmeans()`.
+
+```{r}
+k <- kmeans(x, centers = 2, nstart = 20)
+k
+
+```
+
+> Q1. How many points are in each cluster? 
+
+```{r}
+k$size
+
+```
+> Q2. The clustering result i.e. membership vector?
+
+```{r}
+k$cluster
+
+```
+
+> Q3. Cluster centers
+
+```{r}
+k$centers
+
+```
+
+> Q4. Make a plot of our data colored by clustering results with optionally the cluster centers shown.
+
+```{r}
+plot(x, col = k$cluster, pch = 16)
+points(k$centers, col = "blue", pch = 15, cex = 2)
+
+```
+> Q5. Run kmeans again but cluster into 3 groups and plot the results like we did above. 
+
+```{r}
+k <- kmeans(x, centers = 3, nstart = 20)
+k
+
+plot(x, col = k$cluster, pch = 16)
+points(k$centers, col = "blue", pch = 15, cex = 3)
+
+```
+
+K-means will always return a clustering result - even if there is no clear groupings. 
+
+# Hierarchical Clustering (bottom up)
+Hierarchical clustering has an advantage in that it can reveal the structure in your data rather than imposing a structure as k-means will. 
+
+The main function for this in base R is called `hclust()`
+
+It requires a distance matrix as input, not the raw data itself.
+```{r, echo = FALSE}
+x #reminding ourselves of x
+
+d <- dist(x) #calculating euclidian distance matrix
+d #checking out distance matrix 
+
+hc <- hclust(d) #hierarchical clustering of our distance matrix
+plot(hc) #plotting it as a dendrogram
+abline(h = 8, col = "red")
+
+```
+
+The function to get our clusters/groups from a hclust object is called `cutree()`
+```{r}
+groups <- cutree(hc, h = 8)
+groups
+```
+We can now see the 2 clusters in the original matrix 'x' and that there is instric hierarchy within.
+
+> Q6. Plot our hclust results in terms of our data colored by cluster membership
+
+```{r}
+plot(x, col = groups)
+```
+
+# PCA of UK Food Data
+```{r}
+#Importing UK Food Data
+url <- "https://tinyurl.com/UK-foods" 
+uk_food_data <- read.csv(url)
+```
+
+>Q1: How many rows and columns are in your new data frame named x? What R functions could you use to answer this questions?
+
+## Observing dimensions and first 6 rows
+```{r}
+dim(uk_food_data)
+head(uk_food_data)
+
+```
+
+Assigning row names the wrong way...
+```{r}
+rownames(x) <- x[,1]
+x <- x[,-1]
+head(x)
+
+```
+
+
+## Assigning it the right way...
+```{r}
+x <- read.csv(url, row.names=1) #rownames = first column of df
+head(x)
+
+```
+
+>Q2: Which approach to solving the ‘row-names problem’ mentioned above do you prefer and why? Is one approach more robust than another under certain circumstances?
+
+Second one, since it does not iteratively remove columns and also assigns the row names correctly as you are importing the dataset into R.
+
+## Spotting Major Differences and Trends in Dataset
+```{r}
+barplot(as.matrix(x), beside=T, col=rainbow(nrow(x)))
+
+```
+
+>Q3: Changing what optional argument in the above barplot() function results in the following plot?
+
+```{r}
+barplot(as.matrix(x), beside=F, col=rainbow(nrow(x)))
+#changing beside = T to F results in the shown plot
+```
+
+>Q4: Generating all pairwise plots may help somewhat. Can you make sense of the following code and resulting figure? What does it mean if a given point lies on the diagonal for a given plot?
+
+```{r}
+pairs(x, col=rainbow(10), pch=16)
+
+```
+
+at the y=x line for each plot implies the different foods are equally favored by both corresponsind countries. Above that line implies the country above favors it more by consumption, and vice versa. 
+
+>Q5: What is the main differences between N. Ireland and the other countries of the UK in terms of this data-set?
+
+## PCA to the rescue 
+The main function for PCA in base R is called `prcomp()`
+It wants the transpose (with the `t()`) of our food data for analysis
+```{r}
+pca <- prcomp( t(x) )
+summary(pca)
+
+```
+One of the main results that folks look for is called the "score plot" a.k.a PC plot, PC1 vs PC2, etc...
+
+>Q6: Complete the code below to generate a plot of PC1 vs PC2. The second line adds text labels over the data points.
+
+```{r}
+pca$x
+plot(pca$x[,1], pca$x[,2], xlab="PC1", ylab="PC2", xlim=c(-270,500))
+text(pca$x[,1], pca$x[,2], colnames(x))
+
+```
+
+>Q7: Customize your plot so that the colors of the country names match the colors in our UK and Ireland map and table at start of this document.
+
+```{r}
+colors <- c("orange", "pink", "blue", "#006400")
+
+plot(pca$x[,1], pca$x[,2], xlab="PC1", ylab="PC2", xlim=c(-270,500))
+text(pca$x[,1], pca$x[,2], colnames(x), col = colors)
+```
+
+## How much variation does each PC account for?
+```{r}
+z <- summary(pca)
+z$importance
+
+#visualizing the above
+barplot(z$importance, xlab="Principal Component", ylab="Percent Variation")
+```
+
+## Digging Deeper: Variable Loadings
+```{r}
+## Lets focus on PC1 as it accounts for > 90% of variance 
+par(mar=c(10, 3, 0.35, 0))
+barplot( pca$rotation[,1], las=2 )
+
+```
+
+>Q8: Generate a similar ‘loadings plot’ for PC2. What two food groups feature prominantely and what does PC2 maninly tell us about?
+
+```{r}
+par(mar=c(10, 3, 0.35, 0))
+barplot( pca$rotation[,2], las = 2)
+
+```
+
+Fresh potatoes and soft drinks contribute to the PC2 loadings the most. The negative PC loading of fresh potatoes implies that Wales consume more of these than the others. And vice versa with soft drinks (Scotland consumes more of these than the rest) 
+
+## Using ggplot for these figures
+```{r}
+library(ggplot2)
+
+df <- as.data.frame(pca$x)
+df_lab <- tibble::rownames_to_column(df, "Country")
+
+# Our first basic plot
+ggplot(df_lab) + 
+  aes(PC1, PC2, col=Country) + 
+  geom_point()
+
+```
+
+Make it look nicer!
+```{r}
+ ggplot(df_lab) + 
+  aes(PC1, PC2, col=Country, label=Country) + 
+  geom_hline(yintercept = 0, col="gray") +
+  geom_vline(xintercept = 0, col="gray") +
+  geom_point(show.legend = FALSE) +
+  geom_label(hjust=1, nudge_x = -10, show.legend = FALSE) +
+  expand_limits(x = c(-300,500)) +
+  xlab("PC1 (67.4%)") +
+  ylab("PC2 (28%)") +
+  theme_bw()
+```
+
+Looking at loadings...
+```{r}
+ld <- as.data.frame(pca$rotation)
+ld_lab <- tibble::rownames_to_column(ld, "Food")
+
+ggplot(ld_lab) +
+  aes(PC1, Food) +
+  geom_col() 
+
+```
+
+
+
+

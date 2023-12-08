@@ -1,0 +1,141 @@
+---
+title: "Class 10: Comparative Structure Analysis (Pt2)"
+author: "Jason Hsiao (PID: A15871650)"
+format: pdf
+---
+
+Today we are going to finish off Lab 10 on learning about and analyzing protein structures.
+
+## Comparative Structure Analysis of Adenylate Kinase
+
+We will use the `bio3d` package for this analysis that starts with a single sequence. 
+
+We will also use the `msa` package from BioConductor. First we need to install the `BiocManager`. We install it the same way as other packages with `install.packages()` command.
+
+We use `BiocManager::install()` to install any other BioConductor package we want - like `msa` in this case. 
+
+```{r}
+library(bio3d)
+library(msa)
+
+```
+First we will pick a sequence of interest - I will pick "1ake_A".
+```{r}
+aa <- get.seq("1ake_A")
+aa
+
+```
+
+## BLAST the PDB
+
+Now we want to use this as a query sequence to BLAST with in the PDB to find similar sequences and structures...
+```{r}
+blast <- blast.pdb(aa)
+
+#Plot a summary of search results
+hits <- plot(blast)
+
+#List out some 'top hits'
+head(hits$pdb.id)
+
+```
+
+Let's save our results thus far so we don't have to run BLAST again...
+```{r}
+save(hits, blast, file = "blast_results.Rds")
+#testing whether save() worked from a new environment
+load("blast_results.Rds")
+
+```
+
+Now we want to download the related PDB files (the 'hits') for downstream usage.
+```{r}
+files <- get.pdb(hits$pdb.id, path="pdbs", split=TRUE, gzip=TRUE)
+
+```
+
+## Align and Superpose Structures
+
+Next we will use the `pdbaln()` function to align and also optionally fit (i.e. superpose) the identified PDB structures.
+```{r}
+# Align releated PDBs
+pdbs <- pdbaln(files, fit = TRUE, exefile = "msa")
+pdbs
+
+# Vector containing PDB codes for figure axis
+ids <- basename.pdb(pdbs$id)
+
+# Draw schematic alignment: Grey regions depict aligned residues, while white depict gap regions. The red bar at the top depict sequence conservation.
+plot(pdbs, labels=ids)
+
+```
+
+Now we want to annotate the collected PDB structures. The function `pdb.annotate()` provides a convenient way of annotating the PDB files we have collected. Below we use the function to annotate each structure to its source species. This will come in handy when annotating plots later on:
+```{r}
+anno <- pdb.annotate(ids)
+unique(anno$source)
+
+anno #view all the annotation data
+
+```
+
+## PCA
+
+Function pca() provides principal component analysis (PCA) of the structure data. PCA is a statistical approach used to transform a data set down to a few important components that describe the directions where there is most variance. In terms of protein structures PCA is used to capture major structural variations within an ensemble of structures.
+
+PCA can be performed on the structural ensemble (stored in the pdbs object) with the function `pca.xyz()`, or more simply `pca()`.
+```{r}
+pc.xray <- pca(pdbs) #pca of aligned hits
+plot(pc.xray)
+
+```
+
+Function rmsd() will calculate all pairwise RMSD values of the structural ensemble. This facilitates clustering analysis based on the pairwise structural deviation:
+```{r}
+# Calculate RMSD
+rd <- rmsd(pdbs)
+
+# Structure-based clustering
+hc.rd <- hclust(dist(rd))
+grps.rd <- cutree(hc.rd, k=3)
+
+plot(pc.xray, 1:2, col="grey50", bg=grps.rd, pch=21, cex=1)
+
+```
+
+Visualizing this variance (first PC)
+```{r}
+# Visualize first principal component, producing a pdb file to view in Mol*
+pc1 <- mktrj(pc.xray, pc=1, file="pc_1.pdb")
+
+```
+
+Plotting results with ggplot2 
+```{r}
+library(ggplot2)
+library(ggrepel)
+
+df <- data.frame(PC1=pc.xray$z[,1], 
+                 PC2=pc.xray$z[,2], 
+                 col=as.factor(grps.rd),
+                 ids=ids)
+
+p <- ggplot(df) + 
+  aes(PC1, PC2, col=col, label=ids) +
+  geom_point(size=2) +
+  geom_text_repel(max.overlaps = 20) +
+  theme(legend.position = "none")
+p
+
+```
+
+## Normal mode analysis (NMA)
+```{r}
+# NMA of all structures
+modes <- nma(pdbs)
+
+#plotting
+plot(modes, pdbs, col=grps.rd)
+
+```
+

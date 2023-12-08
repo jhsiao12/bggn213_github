@@ -1,0 +1,100 @@
+---
+title: "Class 10"
+author: "Jason Hsiao (PID: A15871650)"
+format: pdf
+---
+
+Reading CSV File
+```{r}
+#Loading in data
+stats <- read.csv("Data Export Summary.csv", row.names = 1)
+head(stats)
+
+#Removing commas and changing character vectors into numeric vectors
+rm.com <- function(x) {
+  as.numeric(gsub(",","", x))
+}
+
+pdbstats <- apply(stats, 2, rm.com)
+pdbstats #there's no row names!
+
+#adding row names back in
+rownames(pdbstats) <- rownames(stats)
+pdbstats
+
+```
+
+
+> Q1: What percentage of structures in the PDB are solved by X-Ray and Electron Microscopy.
+
+```{r}
+totals <- apply(pdbstats, 2, sum)
+rounded <- round(totals/totals["Total"] * 100, 2)
+
+rounded["X.ray"] + rounded["EM"]
+
+```
+93.16%
+
+> Q2-Q3: Skipping...
+
+## Using Mol* to examine HIV-Pr
+
+Here is a rubbish pic of HIV-Pr that is not very useful yet.
+
+![](1HSG.png)
+
+Refined...
+
+![I want to be a structural bioinformatician :)](1HSG (2).png)
+
+> Q4: Water molecules normally have 3 atoms. Why do we see just one atom per water molecule in this structure?
+
+Because the resolution of the structure is larger than the size of hydrogen atoms.
+
+> Q5: There is a critical “conserved” water molecule in the binding site. Can you identify this water molecule? What residue number does this water molecule have
+
+408
+
+
+> Q6: Below...
+
+## Using the bio3d package
+
+```{r}
+library(bio3d)
+
+pdb <- read.pdb("1hsg")
+pdb
+
+```
+
+```{r}
+head(pdb$atom) #full atom list
+
+head(pdb$atom$resid) #residue names (not all are amino acids)
+
+pdb$calpha #which atoms in the file are residues?
+
+aa321( pdb$atom$resid[ pdb$calpha ] ) #using aa321() to get 1 letter AA code of amino acids in the pdb file
+
+```
+## Predicting functional motions of a single strucutre
+
+Run a Normal Mode Analysis (NMA) - a bioinformatics method to predict functional motions.
+
+```{r}
+adk <- read.pdb("6s36")
+modes <- nma(adk)
+plot(modes)
+
+
+```
+
+Make a trajectory in time to visualize...
+```{r}
+mktrj(modes, pdb = adk, file = "modes.pdb")
+
+```
+
+

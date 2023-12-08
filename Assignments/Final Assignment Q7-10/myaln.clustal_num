@@ -1,0 +1,42 @@
+CLUSTAL O(1.2.4) multiple sequence alignment
+
+
+Danio_rerio_RBP4_(NP_570995.1)                ------------------------------------------------------------	0
+Rattus_norvegicus_RBP4_(NP_037294.1)          ------------------------------------------------------------	0
+Callithrix_jacchus_RBP4_(XP_054099088.1)      -------------------------------------------------MILKLPRPCGT	11
+Gorilla_RBP4_(XP_018890983.3)                 MQAPPAPPLRSFTPRGYESATPSPRRYKAAERPRRAGLPRSTRARTRRPGLRA--VPLPV	58
+Unknown_protein_(BI546698.1_1)                -----------------------------------------------SGGLRA--VPLPV	11
+Homo_sapiens_RBP4_(NP_001310446.1)            ------------------------------------------------------------	0
+                                                                                                          
+
+Danio_rerio_RBP4_(NP_570995.1)                ---------MLRLCIAVCVLATCWAQDCQVSNFAVQQDFNRTRYQGTWYAVAKKDPVGLF	51
+Rattus_norvegicus_RBP4_(NP_037294.1)          ------MEWVWALVLLAALGGGSAERDCRVSSFRVKENFDKARFSGLWYAIAKKDPEGLF	54
+Callithrix_jacchus_RBP4_(XP_054099088.1)      GVLLGKMKWVWALLLLAVLGISRAERDCRVSSFRVKENFDKARFSGTWYAMAKKDPEGLF	71
+Gorilla_RBP4_(XP_018890983.3)                 GGFLGKMKWVWALLLLAALGSGRAERDCRVSSFRVKENFDKARFSGTWYAMAKKDPEGLF	118
+Unknown_protein_(BI546698.1_1)                GGFLGKMKWVWALLLLAALGSGRAERDCRVSSFRVKENFDKARFSGTWYAMAKKDPEGLF	71
+Homo_sapiens_RBP4_(NP_001310446.1)            ------MKWVWALLLLAALGSGRAERDCRVSSFRVKENFDKARFSGTWYAMAKKDPEGLF	54
+                                                       :  * : . :      :**:**.* *:::*:::*:.* ***:***** ***
+
+Danio_rerio_RBP4_(NP_570995.1)                LLDNIVANFKVEEDGTMTATAIGRVIILNNWEMCANMFGTFEDTEDPAKFKMKYWGAAAY	111
+Rattus_norvegicus_RBP4_(NP_037294.1)          LQDNIIAEFSVDEKGHMSATAKGRVRLLSNWEVCADMVGTFTDTEDPAKFKMKYWGVASF	114
+Callithrix_jacchus_RBP4_(XP_054099088.1)      LQDNIIAEFSVDETGQMSATAKGRVRLLNNWDVCADMVGTFTDTEDPAKFKMKYWGVASF	131
+Gorilla_RBP4_(XP_018890983.3)                 LQDNIVAEFSVDETGQMSATAKGRVRLLNNWDVCADMVGTFTDTEDPAKFKMKYWGVASF	178
+Unknown_protein_(BI546698.1_1)                LQDNIVAEFSVDETGQMSATAKGRVRLLNNWDVCADMVGTFTDTEDPAKFKMKYWGVASF	131
+Homo_sapiens_RBP4_(NP_001310446.1)            LQDNIVAEFSVDETGQMSATAKGRVRLLNNWDVCADMVGTFTDTEDPAKFKMKYWGVASF	114
+                                              * ***:*:*.*:* * *:*** *** :*.**::**:*.*** **************.*::
+
+Danio_rerio_RBP4_(NP_570995.1)                LQTGYDDHWIIDTDYDNYAIHYSCRELDEDGTCLDGYSFIFSRHPDGLRPEDQAIVTQKK	171
+Rattus_norvegicus_RBP4_(NP_037294.1)          LQRGNDDHWIIDTDYDTFALQYSCRLQNLDGTCADSYSFVFSRDPNGLTPETRRLVRQRQ	174
+Callithrix_jacchus_RBP4_(XP_054099088.1)      LQKGNDDHWIIDTDYDTYAVQYSCRLLNLDGTCADSYSFVFSRDPNGLPPEAQRIIRQRQ	191
+Gorilla_RBP4_(XP_018890983.3)                 LQKGNDDHWIVDTDYDTYAVQYSCRLLNLDGTCADSYSFVFSRDPNGLPPEAQKIVRQRQ	238
+Unknown_protein_(BI546698.1_1)                LQKGNDDHWIVDTDYDTYAVQYSCRLLNLDGTCADSYSFVFSRDPNGLPPEAQKIVRQRQ	191
+Homo_sapiens_RBP4_(NP_001310446.1)            LQKGNDDHWIVDTDYDTYAVQYSCRLLNLDGTCADSYSFVFSRDPNGLPPEAQKIVRQRQ	174
+                                              ** * *****:*****.:*::****  : **** *.***:***.*:** ** : :: *::
+
+Danio_rerio_RBP4_(NP_570995.1)                QDICFLGKYRRVAHTGFCEAA-----------------------	192
+Rattus_norvegicus_RBP4_(NP_037294.1)          EELCLERQYRWIEHNGYCQSRPSRNSL-----------------	201
+Callithrix_jacchus_RBP4_(XP_054099088.1)      EELCLARQYRLIVHNGYCDGKSERNLL-----------------	218
+Gorilla_RBP4_(XP_018890983.3)                 EELCLARQYRLIVHNGYCDGRSERNLL-----------------	265
+Unknown_protein_(BI546698.1_1)                EELCLARQYRLIVHNGYCDGRSERNLL*QYQESSFI*ELLISSX	233
+Homo_sapiens_RBP4_(NP_001310446.1)            EELCLARQYRLIVHNGYCDGRSERNLL-----------------	201
+                                              :::*:  :** : *.*:*:.                        

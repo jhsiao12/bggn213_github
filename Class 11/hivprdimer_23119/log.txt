@@ -1,0 +1,37 @@
+2023-11-08 23:00:49,890 Unable to initialize backend 'rocm': NOT_FOUND: Could not find registered platform with name: "rocm". Available platform names are: CUDA
+2023-11-08 23:00:49,892 Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: libtpu.so: cannot open shared object file: No such file or directory
+2023-11-08 23:00:52,904 Running on GPU
+2023-11-08 23:00:53,015 Found 4 citations for tools or databases
+2023-11-08 23:00:53,016 Query 1/1: hivprdimer_23119 (length 198)
+2023-11-08 23:00:55,971 Setting max_seq=508, max_extra_seq=1540
+2023-11-08 23:01:57,442 alphafold2_multimer_v3_model_1_seed_000 recycle=0 pLDDT=76.6 pTM=0.691 ipTM=0.531
+2023-11-08 23:02:11,692 alphafold2_multimer_v3_model_1_seed_000 recycle=1 pLDDT=84.4 pTM=0.784 ipTM=0.694 tol=0.86
+2023-11-08 23:02:26,209 alphafold2_multimer_v3_model_1_seed_000 recycle=2 pLDDT=93.9 pTM=0.874 ipTM=0.832 tol=1.84
+2023-11-08 23:02:41,016 alphafold2_multimer_v3_model_1_seed_000 recycle=3 pLDDT=96.4 pTM=0.909 ipTM=0.893 tol=0.191
+2023-11-08 23:02:41,017 alphafold2_multimer_v3_model_1_seed_000 took 92.7s (3 recycles)
+2023-11-08 23:02:56,345 alphafold2_multimer_v3_model_2_seed_000 recycle=0 pLDDT=67.4 pTM=0.614 ipTM=0.41
+2023-11-08 23:03:11,538 alphafold2_multimer_v3_model_2_seed_000 recycle=1 pLDDT=73.1 pTM=0.538 ipTM=0.267 tol=3.38
+2023-11-08 23:03:27,063 alphafold2_multimer_v3_model_2_seed_000 recycle=2 pLDDT=72.3 pTM=0.514 ipTM=0.215 tol=2.25
+2023-11-08 23:03:42,548 alphafold2_multimer_v3_model_2_seed_000 recycle=3 pLDDT=73.3 pTM=0.508 ipTM=0.196 tol=1.08
+2023-11-08 23:03:42,549 alphafold2_multimer_v3_model_2_seed_000 took 61.1s (3 recycles)
+2023-11-08 23:03:58,072 alphafold2_multimer_v3_model_3_seed_000 recycle=0 pLDDT=71.1 pTM=0.625 ipTM=0.423
+2023-11-08 23:04:13,180 alphafold2_multimer_v3_model_3_seed_000 recycle=1 pLDDT=73.2 pTM=0.505 ipTM=0.203 tol=0.979
+2023-11-08 23:04:28,298 alphafold2_multimer_v3_model_3_seed_000 recycle=2 pLDDT=72.6 pTM=0.491 ipTM=0.177 tol=0.364
+2023-11-08 23:04:28,299 alphafold2_multimer_v3_model_3_seed_000 took 45.5s (2 recycles)
+2023-11-08 23:04:43,753 alphafold2_multimer_v3_model_4_seed_000 recycle=0 pLDDT=62.2 pTM=0.659 ipTM=0.478
+2023-11-08 23:04:59,019 alphafold2_multimer_v3_model_4_seed_000 recycle=1 pLDDT=73.6 pTM=0.495 ipTM=0.166 tol=3.42
+2023-11-08 23:05:14,273 alphafold2_multimer_v3_model_4_seed_000 recycle=2 pLDDT=74 pTM=0.534 ipTM=0.237 tol=3.62
+2023-11-08 23:05:29,490 alphafold2_multimer_v3_model_4_seed_000 recycle=3 pLDDT=77.8 pTM=0.601 ipTM=0.349 tol=3.53
+2023-11-08 23:05:29,492 alphafold2_multimer_v3_model_4_seed_000 took 60.9s (3 recycles)
+2023-11-08 23:05:44,932 alphafold2_multimer_v3_model_5_seed_000 recycle=0 pLDDT=73.7 pTM=0.579 ipTM=0.337
+2023-11-08 23:06:00,112 alphafold2_multimer_v3_model_5_seed_000 recycle=1 pLDDT=82.2 pTM=0.676 ipTM=0.51 tol=2.83
+2023-11-08 23:06:15,328 alphafold2_multimer_v3_model_5_seed_000 recycle=2 pLDDT=85 pTM=0.729 ipTM=0.597 tol=0.569
+2023-11-08 23:06:30,559 alphafold2_multimer_v3_model_5_seed_000 recycle=3 pLDDT=93.4 pTM=0.874 ipTM=0.839 tol=1.01
+2023-11-08 23:06:30,560 alphafold2_multimer_v3_model_5_seed_000 took 60.8s (3 recycles)
+2023-11-08 23:06:30,809 reranking models by 'multimer' metric
+2023-11-08 23:06:30,810 rank_001_alphafold2_multimer_v3_model_1_seed_000 pLDDT=96.4 pTM=0.909 ipTM=0.893
+2023-11-08 23:06:30,811 rank_002_alphafold2_multimer_v3_model_5_seed_000 pLDDT=93.4 pTM=0.874 ipTM=0.839
+2023-11-08 23:06:30,812 rank_003_alphafold2_multimer_v3_model_4_seed_000 pLDDT=77.8 pTM=0.601 ipTM=0.349
+2023-11-08 23:06:30,812 rank_004_alphafold2_multimer_v3_model_2_seed_000 pLDDT=73.3 pTM=0.508 ipTM=0.196
+2023-11-08 23:06:30,813 rank_005_alphafold2_multimer_v3_model_3_seed_000 pLDDT=72.6 pTM=0.491 ipTM=0.177
+2023-11-08 23:06:32,580 Done

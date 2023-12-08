@@ -1,0 +1,102 @@
+---
+title: "Class 11: Protein Structure Prediction with AlphaFold"
+author: "Jason Hsiao (PID: A15871650)"
+format: pdf
+---
+
+Here we post process and inspect our modeling results from AlphaFold2 (AF2).
+
+My results from AF2 live in the folder/directory `hivprdimer_23119`
+```{r}
+results_dir <- "hivprdimer_23119/"
+
+#listing only pdb files in the dir, and giving full names as a vector
+pdb_files <- list.files(results_dir, pattern = ".pdb", full.names = TRUE) 
+
+```
+
+We first need to align and superpose these PDB models and we can use the `pdbaln()` function for this
+```{r}
+library(bio3d)
+# Align releated PDBs
+pdbs <- pdbaln(pdb_files, fit = TRUE, exefile = "msa")
+pdbs
+
+```
+
+## The RMSD Matrix
+
+A common measure of structural dis-similarity between structures is called RMSD (root mean square distance). 
+```{r}
+rd <- rmsd(pdbs) 
+
+#Visualizing using pheatmap
+library(pheatmap)
+
+rownames(rd) <- paste0("m", 1:5)
+colnames(rd) <- paste0("m", 1:5)
+
+pheatmap(rd)
+```
+Let's view these in Mol*. Here we want the fitted coordinates to load into Molstar. 
+
+```{r}
+xyz <- pdbfit(pdbs, outpath = "fitted")
+
+```
+
+It's still shite! A full atom based fitting or superposition did not work very well because we have multiple chains that are in different conformations, causing 'smearing' in our visualizing. 
+
+I want to focus our superposition on the most invariant part (the rigid "core") so that we get less 'smearing' when visualizing. To do so, we will use the function `core.find()`, which finds the most common invariant part of the given sequences.  
+
+```{r}
+core <- core.find(pdbs) 
+
+core.inds <- core #defining inds argument of pdbfit(), which is an xyz component that pdbfit() bases its fitting on
+
+xyz <- pdbfit(pdbs, inds = core.inds, outpath = "core_fitted")
+#load "core_fitted" into Mol*... it's better!
+
+```
+
+To evaluate how good multi-chain or multi-domain models are, we need to look at the PAE scores (predicted aligned error)
+
+They are output as JSON format files. Let's find all their file names:
+
+```{r}
+pae_files <- list.files(results_dir, pattern = ".json", full.names = TRUE)
+pae_files
+
+pae_files <- list.files(results_dir, pattern = "0.json", full.names = TRUE) #excluding the error file
+pae_files
+
+```
+
+Using `jsonlite` to open the JSON files:
+
+```{r}
+library(jsonlite)
+
+pae1 <- read_json(pae_files[1], simplifyVector = TRUE)
+pae5 <- read_json(pae_files[5], simplifyVector = TRUE)
+
+```
+
+Looking at PAE for top and bottom 'ranked' files:
+```{r}
+pae1$max_pae
+pae5$max_pae
+
+```
+Plotting pae1: lowest PAE of all
+```{r}
+plot.dmat(pae1$pae,
+          xlab = "Residue No.",
+          ylab = "Residue No.")
+
+```
+
+## Main Points
+
+*We can run AF on Google Compute infrastructure
+*We can read these results into R and process to help make sense of these models and their PAE and pLDDT scores.

@@ -1,0 +1,34 @@
+---
+title: "Final Assignment Q7-10"
+author: "Jason Hsiao"
+format: html
+---
+
+> Q7
+
+```{r}
+# Load bio3d
+library(bio3d) 
+library(pheatmap)
+
+# Read aligned sequences 
+aligned <- read.fasta("myaln_trimmed.fst")
+
+# Using seqidentity() to measure percent identity to plot on heatmap
+seq_identity_matrix <- seqidentity(aligned)
+
+# Plotting heatmap of percent identity
+heatmap(seq_identity_matrix,
+  Rowv = TRUE,
+  Colv = TRUE,
+  keep.dendro = TRUE,
+  col = colorRampPalette(c("white", "blue"))(100),
+  scale = "none",
+  main = "Sequence Identity Heatmap",
+  cexRow = 0.5,
+  cexCol = 0.5,
+  mar = c(10, 10),
+)
+
+```
+
